@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header class="py-5 bg-light border-bottom mb-4">
+    <div class="container">
+        <div class="text-center my-5">
+            <h1 class="fw-bolder">Welcome to MyGames!</h1>
+            <p class="lead mb-0">This is a work sample</p>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="row">
+                {% for game in games %}
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <img class="card-img-top" src="{{ game.image.url }}" alt="..." />
+                        <div class="card-body">
+                            <div class="small text-muted">{{ game.created }}</div>
+                            <h2 class="card-title h4">{{ game.name }}</h2>
+                            <p class="card-text"> {{ game.description|truncatechars:255 }} </p>
+                            <a class="btn btn-primary" href="{% url 'posts:game_details' game.slug %}">Read more →</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <form method='get' class="row g-3">
+                <div class="col-auto">
+                  <label for="q" class="visually-hidden">Query</label>
+                  <input type="text" class="form-control" id="q" placeholder="Query" name='q'>
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary mb-3">Search</button>
+                </div>
+              </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block extracss %}
+<style type="text/css">
+    .img-account-profile {
+        height: 10rem;
+    }
+
+    .rounded-circle {
+        border-radius: 50% !important;
+    }
+
+    .card {
+        box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    }
+
+    .card .card-header {
+        font-weight: 500;
+    }
+
+    .card-header:first-child {
+        border-radius: 0.35rem 0.35rem 0 0;
+    }
+
+    .card-header {
+        padding: 1rem 1.35rem;
+        margin-bottom: 0;
+        background-color: rgba(33, 40, 50, 0.03);
+        border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+    }
+
+    .form-control,
+    .dataTable-input {
+        display: block;
+        width: 100%;
+        padding: 0.875rem 1.125rem;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1;
+        color: #69707a;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #c5ccd6;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border-radius: 0.35rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .nav-borders .nav-link.active {
+        color: #0061f2;
+        border-bottom-color: #0061f2;
+    }
+
+    .nav-borders .nav-link {
+        color: #69707a;
+        border-bottom-width: 0.125rem;
+        border-bottom-style: solid;
+        border-bottom-color: transparent;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+</style>
+{% endblock extracss %}
+{% block content %}
+<hr class="mt-0 mb-4">
+<div class="row">
+    <div class="mx-auto col-xl-4">
+        <div class="card mb-4">
+            <div class="card-header">Game form</div>
+            <div class="card-body">
+                <form method='post' enctype="multipart/form-data">
+                    {{ form.non_field_errors }}
+                    
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.name.id_for_label }}">Name:</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.slug.id_for_label }}">Slug:</label>
+                        {{ form.slug }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.description.id_for_label }}">About Game:</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.genre.id_for_label }}">Genre:</label>
+                        {{ form.genre }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.file.id_for_label }}">Game file:</label>
+                        {{ form.file }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.image.id_for_label }}">Screenshot:</label>
+                        {{ form.image }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.video_url.id_for_label }}">Video url:</label>
+                        {{ form.video_url }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.tags.id_for_label }}">Tags:</label>
+                        {{ form.tags }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.is_published.id_for_label }}">Publish:</label>
+                        {{ form.is_published }}
+                    </div>
+                    {% comment %} {{ user_form.as_p }} {% endcomment %}
+                    {% comment %} {{ form.as_p }} {% endcomment %}
+                    {% csrf_token %}
+                    <input type='submit' value='Submit' class="btn btn-primary"/>
+                </form>
+            </div>
+        
+        </div>
+    </div>
+</div>
+{% comment %} <div class="container-fluid">
+    <form action="" method='post' enctype="multipart/form-data">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <p><input type="submit" value="Save" class="btn btn-primary"></p>
+    </form>
+</div> {% endcomment %}
+{% endblock content %}

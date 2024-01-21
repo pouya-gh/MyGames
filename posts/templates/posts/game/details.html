@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game.name }}{% endblock title %}
+
+
+
+{% block content %}
+<div class="container mt-5">
+<div class="row">
+    <div class="col-lg-8">
+        <article>
+            <header class="mb-4">
+                <!-- Post title-->
+                <h1 class="fw-bolder mb-1">{{ game.name }}</h1>
+                <!-- Post meta content-->
+                <div class="text-muted fst-italic mb-2">Posted on {{ game.publish }} by <a href="{% url 'accounts:profile_details' game.author.username %}">{{ game.author }}</a></div>
+                <div class="text-muted fst-italic mb-2">Last update {{ game.updated }}</div>
+                <!-- Post categories-->
+                <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{ game.genre }}</a>
+                {% comment %} <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> {% endcomment %}
+            </header>
+            <figure class="mb-4"><img class="img-fluid rounded" src="{{ game.image.url }}" alt="..." /></figure>
+            <!-- Post content-->
+            <section class="mb-5">
+                <p>{{ game.description }}</p>
+                <p>average rating: {{ game.average_rating }}</p>
+                <p>
+                    Developers:
+                    <div class="table-responsive-sm w-25">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dev in developers %}
+                                <tr>
+                                    <td><a href="{% url 'accounts:profile_details' dev.user.username %}">{{ dev.user }}</a></td>
+                                    <td>{{ dev.role }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </p>
+                <p>
+                    <div>
+                    {% if request.user.is_authenticated %}
+                        <form action="#" method='post' class='row row-cols-lg-auto g-3 align-items-center'>
+                            <div class="col-12">
+                                {{ rating_form }}
+                            </div>
+                            <div class="col-12">
+                                <input type='submit' value='Rate' class='rating-button btn btn-primary'/>
+                            </div>
+                            
+                        </form>
+                    {% endif %}
+                    </div>
+                </p>
+                <p><a href="{% url 'posts:game_play' game.slug %}" class="btn btn-primary">Play!</a></p>
+
+                <p>
+                    {% if request.user.is_authenticated and request.user.id == game.author.id %}
+                        <a href="{% url 'posts:game_edit' game.slug %}">Edit</a>
+                        <a href="#" class="deletegame">Delete Game</a>
+                        <a href="{% url 'posts:edit_gamedevroles' game.slug %}">Edit game Developers</a>
+                    {% endif %}
+                </p>
+            </section>
+        </article>
+    
+        <!-- Comments section-->
+        <section class="mb-5">
+            <div class="card bg-light">
+                <div class="card-body">
+                    {% if request.user.is_authenticated %}
+                        {% include "posts/comments/form.html" with form=comment_form create_form=True game=game %}
+                    {% endif %}
+                    {% include "posts/comments/list.html" %}
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <p>tags: {{ game.tags }}</p>
+    
+</div>
+</div>
+{% endblock content %}
+
+{% block domready %}
+const deleteGameElem = document.querySelector('a.deletegame');
+
+if (deleteGameElem) {
+    deleteGameElem.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (confirm("Delete game?") == true)
+        {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                window.location.replace("{% url 'posts:game_list' %}")
+            }
+            xhttp.open('POST', "{% url 'posts:game_delete' game.slug %}", true);
+            xhttp.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+            xhttp.send();
+        }
+    });
+}
+
+const ratingButton = document.querySelector('input.rating-button');
+if (ratingButton) {
+    ratingButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        var ratingInput = document.getElementById('id_rating');
+        var data = new FormData();
+        data.append("rating", ratingInput.value)
+        
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function() {
+            {% comment %} alert(this.responseText); {% endcomment %}
+            responseOjb = JSON.parse(this.responseText);
+            if (responseOjb.msg === "error") {
+                reloadUserRating();
+            }
+        }
+        xhttp.open('POST', "{% url 'posts:rate_game' game.id %}", true);
+        xhttp.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+        xhttp.send(data);
+    })
+}
+
+const cdl = document.getElementsByClassName("deletecomment");
+
+for (var i = 0; i < cdl.length; i++) {
+    cdl[i].addEventListener('click', (e) => {
+        e.preventDefault();
+        if (confirm("Delete comment?") == true) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                if (this.status == 200)
+                {
+                    location.reload(); 
+                }
+            }
+            xhttp.open('POST', e.target.href, true);
+            xhttp.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+            xhttp.send();
+        }
+    });
+}
+
+function reloadUserRating() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = function() {
+        if (this.status == 200)
+        {
+            var ratingInput = document.getElementById('id_rating'); 
+            responseOjb = JSON.parse(this.responseText);
+            ratingInput.value = responseOjb.rating;
+        }
+    }
+    xhttp.open('GET', "{% url 'posts:rating_of_game' game.id %}", true);
+    xhttp.send();
+}
+
+{% endblock domready %}

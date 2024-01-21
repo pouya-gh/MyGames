@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}MyGames{% endblock  %}</title>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {% block extracss %}
+        {% endblock extracss %}
+    </head>
+    <body>
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'posts:home' %}">MyGames</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'posts:game_list' %}">Games</a></li>
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link logout" href="#!">Logout</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'posts:game_create' %}">Upload Game</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile_details' request.user.username %}">Profile</a></li>
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login Here</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:sign_up' %}">Sign up here</a></li>
+                        {% endif %}
+                        {% comment %} <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Blog</a></li> {% endcomment %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        
+            {% block content %}
+
+            {% endblock content %}
+        
+        {% comment %} <p>_______________________________________________</p> {% endcomment %}
+            
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                {% block domready %}
+                {% endblock domready %}
+
+                document.querySelector('a.logout').addEventListener('click', (e) => {
+                    e.preventDefault()
+                    const xhttp = new XMLHttpRequest();
+                    xhttp.onload = function() {
+                        if (this.status == 200) {
+                            location.reload(); 
+                        }
+                    }
+                    xhttp.open('POST', "{% url 'logout' %}", true);
+                    xhttp.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    xhttp.send();
+                })
+
+                {% comment %} document.querySelector('button.ajaxposting').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const xhttp = new XMLHttpRequest();
+                    var data = new FormData();
+                    data.append("data", "hello server!!!")
+                    xhttp.onload = function() {
+                        alert(this.responseText);
+                    }
+                    xhttp.open('POST', "{% url 'accounts:test_ajax_post' %}", true);
+                    xhttp.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    xhttp.send(data);
+                }) {% endcomment %}
+            })
+        </script>
+
+    </body>
+</html>

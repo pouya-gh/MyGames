@@ -1,0 +1,24 @@
+<div>
+    {% for comment in comments  %}
+    <div class="d-flex mb-4">
+        <div class="ms-3">
+            {% with author=comment.author %}
+            <div class="fw-bold">{{ author }}</div>
+            <p>{{ comment.body }}</p>
+            {% comment %} <p>{{ comment.created }}</p> {% endcomment %}
+            <div class="text-muted fst-italic mb-2">{{ comment.created }}</div>
+            {% if author == request.user %}
+                    <p><a href='{% url "posts:comment_edit" comment.id %}'>edit comment</a></p>
+                    <p>
+                        {% comment %} <form action='{% url "posts:comment_delete" comment.id %}' method='post'>
+                            {% csrf_token %}
+                            <input type='submit' value='delete comment'/>
+                        </form> {% endcomment %}
+                        <a href='{% url "posts:comment_delete" comment.id %}' class="deletecomment">Delete Comment</a>
+                    </p>
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

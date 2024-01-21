@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game.name }} Developers{% endblock title %}
+
+{% block content %}
+<div class="row">
+    <div class="mx-auto col-xl-4">
+        <div class="card mb-4">
+            <div class="card-header">{{ game.name }} Developers</div>
+            <div class="card-body">
+                <form method='post', enctype="multipart/form-data">
+
+                    {{ formset.management_data }}
+            
+                    {% csrf_token %}
+            
+                    {{ formset.as_p }}
+            
+                    <input type='submit' value='Submit' class="btn btn-primary"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock content %}

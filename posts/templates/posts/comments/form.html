@@ -1,0 +1,11 @@
+{% comment %} {% extends "base.html" %}
+
+{% block content %} {% endcomment %}
+
+    <form class="mb-4" {% if create_form %}action="{% url 'posts:comment_create' game.id %}"{% endif %} method='post'>
+        {{ form.as_p }}
+        {% csrf_token %}
+        <input type='submit' value='submit' class="btn btn-primary"/>
+    </form>
+
+{% comment %} {% endblock content %} {% endcomment %}
