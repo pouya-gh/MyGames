@@ -53,7 +53,7 @@ class Game(models.Model):
     ratings = models.ManyToManyField(User, through='Rating', related_name='rated_games')
 
     objects = models.Manager()
-    published_games = models.Manager()
+    published_games = PublishedGamesManager()
 
     class Meta:
         ordering = ['-publish']
