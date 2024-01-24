@@ -49,6 +49,8 @@ class RatingForm(forms.ModelForm):
         r = self.cleaned_data['rating']
         if r > 10:
             r = 10
+        elif r < 1:
+            r = 1
 
         return r
 
