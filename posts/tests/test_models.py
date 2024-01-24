@@ -9,7 +9,7 @@ import shutil
 class GameModelTestClass(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        print('setUpTestData: run once to set up non-modified data for all class methods.')
+        print('setUpTestData: run once to set up non-modified data for all class methods. sdfsdf')
         User.objects.create(**{'username':"user1", 'password':"123456789)"})
         User.objects.create(**{'username':"user2", 'password':"123456789)"})
         Genre.objects.create(name="FPS", slug="fps")
@@ -36,16 +36,17 @@ class GameModelTestClass(TestCase):
                             is_published = False)
         
         GameDevRole.objects.create(game_id=1, user_id=1, role="Composer")
-        # super().setUpClass()
+        super().setUpTestData()
 
     @classmethod
     def tearDownClass(cls) -> None:
+        print("teardown models tests")
         shutil.rmtree(settings.test.MEDIA_ROOT, ignore_errors=True)
-        #super().tearDownClass()
+        super().tearDownClass()
 
-    def setUp(self) -> None:
-        print("setUp: run once for every test method to set up clean data.")
-        pass
+    # def setUp(self) -> None:
+    #     print("setUp: run once for every test method to set up clean data.")
+    #     pass
 
     def tearDown(self) -> None:
         return super().tearDown()
