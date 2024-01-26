@@ -90,7 +90,6 @@ class Game(models.Model):
         else:
             pass
         super(Game, self).save(*args, **kwargs)
-        print(self.file.path)
         if should_extract_gamefiles:
             extract_gamefile.delay(str(settings.MEDIA_ROOT / game_file_path_maker(self)),
                                        str(self.file.path))
