@@ -1,12 +1,17 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Game, Rating, GameDevRole, game_file_path_maker
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.list import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.forms import modelformset_factory
+
 from .forms import GameForm, RatingForm, GameDevRoleForm, CommentForm
 from .myviews.comments_views import *
 from .myviews.ratings_views import *
-from django.core.exceptions import ObjectDoesNotExist
-from django.forms import modelformset_factory
+from .models import Game, Rating, GameDevRole, game_file_path_maker
+
 from games import settings
 
 import os
