@@ -1,53 +1,51 @@
+from typing import Any
+from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.generic.edit import UpdateView, DeleteView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-# from ..views import *
 from ..forms import CommentForm
 from ..models import Game, Comment
 
-@login_required
-def comment_create(request, game_id):
-    game = get_object_or_404(Game, pk=game_id)
+class CommentCreate(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'posts/comments/form.html'
+    template_name_field = 'form'
 
-    if request.POST:
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         form = CommentForm(request.POST)
+        game = get_object_or_404(Game, pk=kwargs["game_id"])
+        print(game.name)
         if form.is_valid():
             cd = form.cleaned_data
             comment = form.save(commit=False)
             comment.game = game
             comment.author = request.user
             comment.save()
-
-            return redirect("posts:game_details", slug=game.slug)
-        else:
-            return render(request, 'posts/comments/form.html', {'form': form})
-    else:
-        form = CommentForm()
-
+            return redirect(game)
         return render(request, 'posts/comments/form.html', {'form': form})
+        
     
-@login_required
-def comment_edit(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id, author__id=request.user.id)
-    
-    if request.POST:
-        form = CommentForm(request.POST, instance=comment)
-        if form.is_valid():
-            cd = form.cleaned_data
-            form.save()
+class CommentUpdate(LoginRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "posts/comments/form.html"
+    template_name_field = 'form'
 
-            return redirect("posts:game_details", slug=comment.game.slug)
-        else:
-            return render(request, 'posts/comments/form.html', {'form': form})
-    else:
-        form = CommentForm(instance=comment)
-        return render(request, "posts/comments/form.html", {'form': form})
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.model.objects.filter(author=self.request.user)
     
-@require_POST
-@login_required
-def comment_delete(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id, author__id=request.user.id)
-    game = comment.game
-    comment.delete()
-    return redirect("posts:game_details", slug=game.slug)
+    def get_success_url(self) -> str:
+        return self.get_object().game.get_absolute_url()
+     
+
+class CommentDelete(LoginRequiredMixin, DeleteView):
+    model = Comment
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.model.objects.filter(author=self.request.user)
+
+    def get_success_url(self) -> str:
+        return self.get_object().game.get_absolute_url()
