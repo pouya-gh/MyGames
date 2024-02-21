@@ -1,11 +1,14 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
+from django.urls import reverse_lazy
 
 from .forms import GameForm, RatingForm, GameDevRoleForm, CommentForm
 from .myviews.comments_views import *
@@ -16,85 +19,74 @@ from games import settings
 
 import os
 
-def game_details(request, slug):
-    game = get_object_or_404(Game, slug=slug)
-    comments = game.comment_set.all()
-    comment_form = CommentForm()
-    if request.user.is_authenticated:
-        try:
-            rating = Rating.objects.get(game__id=game.id, user__id=request.user.id)
-            rating_form = RatingForm(instance=rating)
-        except ObjectDoesNotExist:
-            rating_form = RatingForm()
-    else:
-        rating_form = None
-            
-    developers = GameDevRole.objects.filter(game=game)
+class GameDetails(DetailView):
+    model = Game
+    template_name = "posts/game/details.html"
+    context_object_name = 'game'
 
-    return render(request, 
-                  "posts/game/details.html", 
-                  {"game": game,
-                   'comments': comments,
-                   'rating_form': rating_form,
-                   'developers': developers,
-                   'comment_form': comment_form,})
-
-
-def game_list(request):
-    search_query = request.GET.get('q')
-    if search_query:
-        games = Game.published_games.filter(name__contains=search_query)
-    else:
-        games = Game.published_games.all()
-
-    return render(request, "posts/game/list.html", {'games': games})
-
-@login_required
-def game_edit(request, slug):
-    game = get_object_or_404(Game, slug=slug, author__id=request.user.id)
-    if request.POST:
-        form = GameForm(data=request.POST, files=request.FILES, instance=game)
-        if form.is_valid():
-            cd = form.cleaned_data
-            game_edit = form.save()
-
-            # return render(request, 'posts/game/details.html', {'game': game_edit})
-            return redirect("posts:game_details", slug=game.slug)
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs.get('slug')
+        game = get_object_or_404(self.model, slug=slug)
+        comments = game.comment_set.all()
+        comment_form = CommentForm()
+        developers = GameDevRole.objects.filter(game=game)
+        if self.request.user.is_authenticated:
+            try:
+                rating = Rating.objects.get(game__id=game.id, user__id=self.request.user.id)
+                rating_form = RatingForm(instance=rating)
+            except ObjectDoesNotExist:
+                rating_form = RatingForm()
         else:
-            return render(request, "posts/game/form.html", {"form": form})
-    else:
-        form = GameForm(instance=game)
-        return render(request, "posts/game/form.html", {"form": form})
+            rating_form = None
 
+        context["comments"] = comments
+        context["comment_form"] = comment_form
+        context["developers"] = developers
+        context["rating_form"] = rating_form
+        return context
+    
 
-@login_required
-def game_create(request):
-    if request.POST:
-        form = GameForm(request.POST, files=request.FILES)
-        if form.is_valid():
-            cd = form.cleaned_data
-            game = form.save(commit=False)
-            game.author = request.user
-            game.save()
+class GameList(ListView):
+    model = Game
+    template_name = "posts/game/list.html"
+    context_object_name = "games"
 
-            GameDevRole.objects.create(user=request.user, role="Original Poster", game=game)
-            # game.team_members.add(user=request.user, role="Original Poster")
-            # return render(request, 'posts/game/details.html', {'game': game})
-            return redirect("posts:game_details", slug=game.slug)
+    def get_queryset(self) -> QuerySet[Any]:
+        search_query = self.request.GET.get('q', '')
+        if search_query:
+            return self.model.published_games.filter(name__contains=search_query)
         else:
-            return render(request, "posts/game/form.html", {"form": form})
-    else:
-        form = GameForm()
-        return render(request, "posts/game/form.html", {"form": form})
+            return self.model.published_games.all()
 
-@require_POST   
-@login_required
-def game_delete(request, slug):
-    # if request.POST:
-    game = get_object_or_404(Game, slug=slug, author__id=request.user.id)
-    game.delete()
+class GameCreate(LoginRequiredMixin, CreateView):
+    model = Game
+    form_class = GameForm
+    context_object_name = 'game'
+    template_name = "posts/game/form.html"
+    template_name_field = 'form'
 
-    return redirect("posts:game_list")
+    def form_valid(self, form):
+        # form.cleaned_data
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.save()
+        GameDevRole.objects.create(user=self.request.user, role="Original Poster", game=self.object)
+
+        return redirect(self.object)
+    
+class GameEdit(LoginRequiredMixin, UpdateView):
+    model = Game
+    form_class = GameForm
+    context_object_name = 'game'
+    template_name = "posts/game/form.html"
+    template_name_field = 'form'
+
+class GameDelete(LoginRequiredMixin, DeleteView):
+    model = Game
+    success_url = reverse_lazy("posts:game_list")
+    def get_queryset(self):
+        return self.model.objects.filter(slug=self.kwargs.get('slug', ''), author=self.request.user)
 
 @login_required
 def edit_gamedevroles(request, slug):
