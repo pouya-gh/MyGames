@@ -1,6 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -15,14 +13,9 @@ def rate_game(request, game_id):
         game = Game.objects.get(pk=game_id)
         if rating_form.is_valid():
             cd = rating_form.cleaned_data
-            #rating = rating_form.save(commit=False)
             (r, _) = Rating.objects.get_or_create(game=game, user=request.user)
             r.rating = cd['rating']
-            # rating.game = game
-            # rating.user = request.user
-            # rating.save()
             r.save()
-            # game.ratings.add(rating)
             game.average_rating = game.calculate_averate_rating()
             game.save()
             return JsonResponse({'msg': 'success'})
