@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator;
 from games import settings
 from .tasks import extract_gamefile
+from django.urls import reverse
 
 import shutil
 
@@ -93,6 +94,10 @@ class Game(models.Model):
         if should_extract_gamefiles:
             extract_gamefile.delay(str(settings.MEDIA_ROOT / game_file_path_maker(self)),
                                        str(self.file.path))
+            
+    def get_absolute_url(self):
+        return reverse("posts:game_details", kwargs={"slug": self.slug})
+    
 
 
 class Rating(models.Model):
