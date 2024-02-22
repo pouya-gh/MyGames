@@ -11,7 +11,8 @@
         <article>
             <header class="mb-4">
                 <!-- Post title-->
-                <h1 class="fw-bolder mb-1">{{ game.name }}</h1>
+                <h1 class="fw-bolder mb-1">{{ game.name }} </h1>
+                {% if not game.is_published %}<span class="badge bg-danger">Not published</span>{% endif %}
                 <!-- Post meta content-->
                 <div class="text-muted fst-italic mb-2">Posted on {{ game.publish }} by <a href="{% url 'accounts:profile_details' game.author.username %}">{{ game.author }}</a></div>
                 <div class="text-muted fst-italic mb-2">Last update {{ game.updated }}</div>

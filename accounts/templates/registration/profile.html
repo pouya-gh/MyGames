@@ -199,6 +199,9 @@
                         {% for game in published_games %}
                         <li>
                             <a href="{% url 'posts:game_details' game.slug %}">{{ game }}</a>
+                            {% if not game.is_published %}
+                            <span class="badge bg-danger">Not published</span>
+                            {% endif %}
                         </li>
                         {% endfor %}
                     </ul>
@@ -209,6 +212,9 @@
                         {% for game in developed_games %}
                         <li>
                             <a href="{% url 'posts:game_details' game.slug %}">{{ game }}</a>
+                            {% if not game.is_published %}
+                            <span class="badge bg-danger">Not published</span>
+                            {% endif %}
                         </li>
                         {% endfor %}
                     </ul>
