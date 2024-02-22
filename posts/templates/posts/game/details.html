@@ -16,7 +16,10 @@
                 <div class="text-muted fst-italic mb-2">Posted on {{ game.publish }} by <a href="{% url 'accounts:profile_details' game.author.username %}">{{ game.author }}</a></div>
                 <div class="text-muted fst-italic mb-2">Last update {{ game.updated }}</div>
                 <!-- Post categories-->
-                <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{ game.genre }}</a>
+                <a class="badge bg-secondary text-decoration-none link-light" href="{% url "posts:game_list" %}?genre={{game.genre.slug}}">{{ game.genre }}</a>
+                {% for tag in tags  %}
+                <a class="badge bg-secondary text-decoration-none link-light" href="{% url "posts:game_list" %}?tag={{tag.slug}}">{{ tag.name }}</a>
+                {% endfor %}
                 {% comment %} <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> {% endcomment %}
             </header>
             <figure class="mb-4"><img class="img-fluid rounded" src="{{ game.image.url }}" alt="..." /></figure>
@@ -84,8 +87,6 @@
             </div>
         </section>
     </div>
-    
-    <p>tags: {{ game.tags }}</p>
     
 </div>
 </div>

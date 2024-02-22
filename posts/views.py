@@ -10,10 +10,12 @@ from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy
 
+from taggit.models import Tag
+
 from .forms import GameForm, RatingForm, GameDevRoleForm, CommentForm
 from .myviews.comments_views import *
 from .myviews.ratings_views import *
-from .models import Game, Rating, GameDevRole, game_file_path_maker
+from .models import Game, Genre, Rating, GameDevRole, game_file_path_maker
 
 from games import settings
 
@@ -31,6 +33,7 @@ class GameDetails(DetailView):
         comments = game.comment_set.all()
         comment_form = CommentForm()
         developers = GameDevRole.objects.filter(game=game)
+        tags = game.tags.all()
         if self.request.user.is_authenticated:
             try:
                 rating = Rating.objects.get(game__id=game.id, user__id=self.request.user.id)
@@ -44,6 +47,7 @@ class GameDetails(DetailView):
         context["comment_form"] = comment_form
         context["developers"] = developers
         context["rating_form"] = rating_form
+        context["tags"] = tags
         return context
     
 
@@ -54,8 +58,16 @@ class GameList(ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         search_query = self.request.GET.get('q', '')
+        tag_slug = self.request.GET.get('tag', '')
+        genre_slug = self.request.GET.get('genre', '')
         if search_query:
             return self.model.published_games.filter(name__contains=search_query)
+        elif tag_slug:
+            tag = get_object_or_404(Tag, slug=tag_slug)
+            return self.model.published_games.filter(tags__in=[tag])
+        elif genre_slug:
+            genre = get_object_or_404(Genre, slug=genre_slug)
+            return self.model.published_games.filter(genre=genre)
         else:
             return self.model.published_games.all()
 
