@@ -13,7 +13,8 @@ class TestPostsGamesViews(TestCase):
         User.objects.create(**{'username':"user1", 'password':"123456789))"})
         User.objects.create(**{'username':"user2", 'password':"123456789)"})
         Genre.objects.create(name="FPS", slug="fps")
-        Game.objects.create(name = 'very cool game', slug='very-cool-game', 
+        Genre.objects.create(name='RPG', slug='rpg')
+        game1 = Game.objects.create(name = 'very cool game', slug='very-cool-game', 
                             description='testsing osijfoei j',
                             author_id = 1,
                             genre_id = 1,
@@ -23,19 +24,21 @@ class TestPostsGamesViews(TestCase):
                             image = SimpleUploadedFile("best_fa.txt",
                                                         b"these are the file contents!"),
                             is_published = True)
+        game1.tags.add("tag1")
         
-        Game.objects.create(name = 'very bad game', slug='very-bad-game', 
+        game2 = Game.objects.create(name = 'very bad game', slug='very-bad-game', 
                             description='testsing osijfoei j',
                             author_id = 1,
-                            genre_id = 1,
+                            genre_id = 2,
                             video_url = "someurl.com",
                             file = SimpleUploadedFile("best_file_eva.txt",
                                                         b"these are the file contents!"),
                             image = SimpleUploadedFile("best_fa.txt",
                                                         b"these are the file contents!"),
                             is_published = True)
+        game2.tags.add("tag2")
         
-        Game.objects.create(name = 'unpublished game', slug='unpublished-game', 
+        game3 = Game.objects.create(name = 'unpublished game', slug='unpublished-game', 
                             description='testsing osijfoei j',
                             author_id = 1,
                             genre_id = 1,
@@ -45,6 +48,7 @@ class TestPostsGamesViews(TestCase):
                             image = SimpleUploadedFile("best_fa.txt",
                                                         b"these are the file contents!"),
                             is_published = False)
+        game3.tags.add("tag3")
         
         GameDevRole.objects.create(game_id=1, user_id=1, role="Composer")
         super().setUpTestData()
@@ -65,6 +69,24 @@ class TestPostsGamesViews(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['games']), 2, "the games list doesn't contain only published games")
+        self.assertTemplateUsed(response, "posts/game/list.html")
+
+    def test_games_list_search_with_tags(self):
+        response = self.client.get(reverse("posts:home") + "?tag=tag1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['games']), 1)
+        self.assertTemplateUsed(response, "posts/game/list.html")
+
+    def test_games_list_search_with_tags_only_published_games(self):
+        response = self.client.get(reverse("posts:home") + "?tag=tag3")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['games']), 0)
+        self.assertTemplateUsed(response, "posts/game/list.html")
+
+    def test_games_list_search_with_genre(self):
+        response = self.client.get(reverse("posts:home") + "?genre=fps")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['games']), 1) #this also asserts if the search is done only in published games
         self.assertTemplateUsed(response, "posts/game/list.html")
 
     def test_redirect_game_create_if_loggedout(self):
