@@ -8,6 +8,11 @@ from ..models import Game, Rating
 
 @login_required
 def rate_game(request, game_id):
+    """
+    i tried to mix 2 views in one function here, like most "create" views. 
+    i register this function in urls twice with different names. one for
+    the GET part and the other for the POST part.
+    """
     if request.POST:
         rating_form = RatingForm(request.POST)
         game = Game.objects.get(pk=game_id)

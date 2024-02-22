@@ -13,7 +13,7 @@ urlpatterns = [
     path("games/<int:game_id>/comment/new", views.CommentCreate.as_view(), name='comment_create'),
     path("comments/<int:pk>", views.CommentDelete.as_view(), name='comment_delete'),
     path("comments/<int:pk>/edit", views.CommentUpdate.as_view(), name='comment_edit'),
-    path("rating/<int:game_id>", views.rate_game, name='rate_game'),
-    path("rating/<int:game_id>", views.rate_game, name='rating_of_game'),
+    path("rating/<int:game_id>", views.rate_game, name='rate_game'),# registered with different names for convenience. one for GET and one for POST 
+    path("rating/<int:game_id>", views.rate_game, name='rating_of_game'),# registered with different names for convenience. one for GET and one for POST
     path("gamedevroles/<slug:slug>", views.edit_gamedevroles, name='edit_gamedevroles'),
 ]

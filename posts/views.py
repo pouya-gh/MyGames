@@ -95,15 +95,13 @@ def edit_gamedevroles(request, slug):
     DevRolesFormset = modelformset_factory(GameDevRole, 
                                            form=GameDevRoleForm, 
                                            extra=2,
-                                           can_delete=True)
-                                           
+                                           can_delete=True)                           
 
     formset = DevRolesFormset(request.POST or None)
     formset.queryset = queryset=GameDevRole.objects.filter(game_id=game.id)
 
     if request.POST:
         if formset.is_valid():
-            print("slfjweo ifjowei fjeoi")
             formset.save(commit=False)
             # for obj in formset.deleted_objects:
             #     obj.delete()
