@@ -39,7 +39,22 @@
                   <button type="submit" class="btn btn-primary mb-3">Search</button>
                 </div>
               </form>
+
+              <div class="card mb-4">
+                <div class="card-header">Genres</div>
+                <div class="card-body">
+                    <div class="row">
+                        <ul class="list-unstyled mb-0">
+                        {% for genre in genres %}
+                        <li><a href="{% url "posts:game_list" %}?genre={{genre.slug}}">{{ genre.name }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        
     </div>
 </div>
 {% endblock content %}

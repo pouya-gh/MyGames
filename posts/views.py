@@ -56,6 +56,12 @@ class GameList(ListView):
     template_name = "posts/game/list.html"
     context_object_name = "games"
 
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        genres = Genre.objects.all()
+        context['genres'] = genres
+        return context
+
     def get_queryset(self) -> QuerySet[Any]:
         search_query = self.request.GET.get('q', '')
         tag_slug = self.request.GET.get('tag', '')
