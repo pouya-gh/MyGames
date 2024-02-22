@@ -1,8 +1,9 @@
 from django.test import TestCase
-from posts.models import Genre, Game, Rating, GameDevRole
+from posts.models import Genre, Game, Rating, GameDevRole, game_file_directory_path, game_file_path_maker, game_image_directory_path
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.urls import reverse_lazy
 from games import settings
 import shutil
 
@@ -10,10 +11,10 @@ class GameModelTestClass(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         print('setUpTestData: run once to set up non-modified data for all class methods. sdfsdf')
-        User.objects.create(**{'username':"user1", 'password':"123456789)"})
-        User.objects.create(**{'username':"user2", 'password':"123456789)"})
+        user1 = User.objects.create(**{'username':"user1", 'password':"123456789)"})
+        user2 = User.objects.create(**{'username':"user2", 'password':"123456789)"})
         Genre.objects.create(name="FPS", slug="fps")
-        Game.objects.create(name = 'Test', slug='test', 
+        game1 = Game.objects.create(name = 'Test', slug='test', 
                             description='testsing osijfoei j',
                             author_id = 1,
                             genre_id = 1,
@@ -24,7 +25,7 @@ class GameModelTestClass(TestCase):
                                                         b"these are the file contents!"),
                             is_published = True)
         
-        Game.objects.create(name = 'Test2', slug='test2', 
+        game2 = Game.objects.create(name = 'Test2', slug='test2', 
                             description='testsing osijfoei j',
                             author_id = 1,
                             genre_id = 1,
@@ -36,6 +37,8 @@ class GameModelTestClass(TestCase):
                             is_published = False)
         
         GameDevRole.objects.create(game_id=1, user_id=1, role="Composer")
+        Rating.objects.create(rating=6, user=user1, game=game1)
+        Rating.objects.create(rating=7, user=user2, game=game1)
         super().setUpTestData()
 
     @classmethod
@@ -95,3 +98,21 @@ class GameModelTestClass(TestCase):
         genre = Genre.objects.first()
         max_length = genre._meta.get_field('slug').max_length
         self.assertEqual(max_length, 250)
+
+    def test_game_absolute_url(self):
+        game: Game = Game.published_games.first()
+        self.assertEqual(game.get_absolute_url(), "/games/test")
+
+    def test_game_average_rating(self):
+        game: Game = Game.published_games.first()
+        self.assertAlmostEqual(game.calculate_averate_rating(), 6.5)
+
+    def test_game_file_path_helper_functions(self):
+        game = Game.published_games.first()
+
+        self.assertEqual(game_file_path_maker(game), f"game_{game.slug}/file")
+        self.assertEqual(game_file_path_maker(game, "thefolder"), f"game_{game.slug}/thefolder")
+
+        self.assertEqual(game_file_directory_path(game, "filename"), f'game_{game.slug}/file/filename')
+        
+        self.assertEqual(game_image_directory_path(game, "imagename"), f'game_{game.slug}/image/imagename')
