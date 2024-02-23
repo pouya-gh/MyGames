@@ -49,7 +49,8 @@ class GameModelTestClass(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        print("teardown models tests")
+        for game in Game.objects.all():
+            game.delete()
         shutil.rmtree(settings.test.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 

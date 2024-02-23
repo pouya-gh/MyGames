@@ -33,9 +33,10 @@ class FormsTestClass(TestCase):
     
     @classmethod
     def tearDownClass(cls) -> None:
-        # print("teardown forms tests")
-        # game = Game.objects.get(slug='test3')
-        # game.delete()
+        # i should delete games manually so the files are deleted after the tests are run
+        # this is only necessary for games
+        for game in Game.objects.all():
+            game.delete()
         shutil.rmtree(settings.test.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
     
