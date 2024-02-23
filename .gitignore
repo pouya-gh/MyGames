@@ -4,3 +4,4 @@ media/game**
 .env
 # media/**
 teststemp
+testsdb.sqlite3

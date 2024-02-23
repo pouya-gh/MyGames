@@ -5,6 +5,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.conf import settings
 
+from posts.forms import GameForm
+
 import shutil
 
 class TestPostsGamesViews(TestCase):
@@ -144,4 +146,42 @@ class TestPostsGamesViews(TestCase):
         })
         self.assertEqual(Game.published_games.count(), 3)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(True)
+
+    def test_games_creat_view_post_with_empty_fields(self):
+        login = self.client.force_login(User.objects.first())
+        image_bytes = None
+        file_bytes = None
+        with open("media/1x1.png", "rb") as image:
+            image_bytes = image.read()
+        with open('media/test.zip', 'rb') as file:
+            file_bytes = file.read()
+        dummy_file = SimpleUploadedFile("test.zip", file_bytes)
+        dummy_image = SimpleUploadedFile("best_fa.png", image_bytes, content_type='image/png')
+        data = {"name": 'some game',
+            "slug": 'some-game',
+            "description": 'testsing osijfoei j',
+            "genre": 1,
+            "video_url": "someurl.com",
+            "file": dummy_file,
+            "image": dummy_image,
+            "tags": "tag1",
+            "is_published": True,}
+
+        data_invalid = data.copy()
+        
+        for k in data.keys():
+            if k in ['is_published']:
+                break
+            data_invalid['file'] = SimpleUploadedFile("test.zip", file_bytes) # for some reason, copying the dict wont copy file references. so i have make new dummy files every time.
+            data_invalid['image'] = SimpleUploadedFile("best_fa.png", image_bytes, content_type='image/png')
+            data_invalid[k] = ''
+            response = self.client.post(reverse("posts:game_create"), data=data_invalid)
+            self.assertEqual(response.status_code, 200, f"there is a problem with \"{k}\"")
+            self.assertTemplateUsed(response, "posts/game/form.html", f"there is a problem with \"{k}\"")
+            form: GameForm = response.context['form']
+
+            if len(form.errors) > 1:
+                print(form.errors)
+            self.assertEqual(len(form.errors), 1, f"there is a problem with \"{k}\"")
+            
+            data_invalid = data.copy()
