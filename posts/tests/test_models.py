@@ -10,7 +10,13 @@ import shutil
 class GameModelTestClass(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        print('setUpTestData: run once to set up non-modified data for all class methods. sdfsdf')
+        # print('setUpTestData: run once to set up non-modified data for all class methods. sdfsdf')
+        image_bytes = None
+        file_bytes = None
+        with open("media/1x1.png", "rb") as image:
+            image_bytes = image.read()
+        with open('media/test.zip', 'rb') as file:
+            file_bytes = file.read()
         user1 = User.objects.create(**{'username':"user1", 'password':"123456789)"})
         user2 = User.objects.create(**{'username':"user2", 'password':"123456789)"})
         Genre.objects.create(name="FPS", slug="fps")
@@ -19,10 +25,10 @@ class GameModelTestClass(TestCase):
                             author_id = 1,
                             genre_id = 1,
                             video_url = "someurl.com",
-                            file = SimpleUploadedFile("best_file_eva.txt",
-                                                        b"these are the file contents!"),
-                            image = SimpleUploadedFile("best_fa.txt",
-                                                        b"these are the file contents!"),
+                            file = SimpleUploadedFile("test.zip",
+                                                        file_bytes),
+                            image = SimpleUploadedFile("1x1.png",
+                                                        image_bytes),
                             is_published = True)
         
         game2 = Game.objects.create(name = 'Test2', slug='test2', 
@@ -30,10 +36,10 @@ class GameModelTestClass(TestCase):
                             author_id = 1,
                             genre_id = 1,
                             video_url = "someurl.com",
-                            file = SimpleUploadedFile("best_file_eva.txt",
-                                                        b"these are the file contents!"),
-                            image = SimpleUploadedFile("best_fa.txt",
-                                                        b"these are the file contents!"),
+                            file = SimpleUploadedFile("test.zip",
+                                                        file_bytes),
+                            image = SimpleUploadedFile("1x1.png",
+                                                        image_bytes),
                             is_published = False)
         
         GameDevRole.objects.create(game_id=1, user_id=1, role="Composer")
