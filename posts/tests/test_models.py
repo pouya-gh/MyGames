@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
-from games import settings
+from django.conf import settings
 import shutil
 
 class GameModelTestClass(TestCase):
@@ -49,14 +49,8 @@ class GameModelTestClass(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        for game in Game.objects.all():
-            game.delete()
-        shutil.rmtree(settings.test.MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
-
-    # def setUp(self) -> None:
-    #     print("setUp: run once for every test method to set up clean data.")
-    #     pass
 
     def tearDown(self) -> None:
         return super().tearDown()

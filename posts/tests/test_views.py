@@ -3,8 +3,7 @@ from django.urls import reverse
 from posts.models import Genre, Game, Rating, GameDevRole
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
-from games import settings
-from ..forms import GameForm
+from django.conf import settings
 
 import shutil
 
@@ -62,9 +61,7 @@ class TestPostsGamesViews(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(settings.test.MEDIA_ROOT, ignore_errors=True)
-        for game in Game.objects.all():
-            game.delete()
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
 
@@ -145,8 +142,6 @@ class TestPostsGamesViews(TestCase):
             "tags": "tag1",
             "is_published": True,
         })
-        # print(response)
-        # print(response.content)
         self.assertEqual(Game.published_games.count(), 3)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(True)

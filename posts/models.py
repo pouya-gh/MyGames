@@ -5,7 +5,7 @@ from taggit.managers import TaggableManager
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator;
-from games import settings
+from django.conf import settings
 from .tasks import extract_gamefile
 from django.urls import reverse
 

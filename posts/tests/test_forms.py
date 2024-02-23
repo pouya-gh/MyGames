@@ -2,7 +2,7 @@ from django.test import TestCase
 from posts.forms import GameForm, CommentForm, RatingForm, GameDevRoleForm
 from django.core.files.uploadedfile import SimpleUploadedFile
 from posts.models import Genre, Game, Rating, GameDevRole
-from games import settings
+from django.conf import settings
 from django.contrib.auth.models import User
 import shutil
 
@@ -33,11 +33,7 @@ class FormsTestClass(TestCase):
     
     @classmethod
     def tearDownClass(cls) -> None:
-        # i should delete games manually so the files are deleted after the tests are run
-        # this is only necessary for games
-        for game in Game.objects.all():
-            game.delete()
-        shutil.rmtree(settings.test.MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
     
         
