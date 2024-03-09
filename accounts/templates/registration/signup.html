@@ -17,11 +17,15 @@
                         {{ form.username }}
                     </div>
                     <div class="mb-3">
+                        <label class="small mb-1" for="{{ form.invitation_id.id_for_label }}">Invitation Code:</label>
+                        {{ form.invitation_id }}
+                    </div>
+                    <div class="mb-3">
                         <label class="small mb-1" for="{{ form.password.id_for_label }}">Password:</label>
                         {{ form.password1 }}
                     </div>
                     <div class="mb-3">
-                        <label class="small mb-1" for="{{ form.password.id_for_label }}">Password:</label>
+                        <label class="small mb-1" for="{{ form.password.id_for_label }}">Repeat Password:</label>
                         {{ form.password2 }}
                     </div>
                     {% csrf_token %}

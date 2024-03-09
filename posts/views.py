@@ -17,7 +17,7 @@ from .myviews.comments_views import *
 from .myviews.ratings_views import *
 from .models import Game, Genre, Rating, GameDevRole, game_file_path_maker
 
-from games import settings
+from django.conf import settings
 
 import os
 

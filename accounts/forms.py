@@ -4,6 +4,7 @@ from django import forms
 from django.core.files.base import File
 from django.db.models.base import Model
 from django.forms.utils import ErrorList
+from django.contrib.auth.forms import UserCreationForm
 from .models import Profile
 from django.contrib.auth.models import User
 
@@ -30,3 +31,13 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+
+class MyUserCreationForm(UserCreationForm):
+    invitation_id = forms.UUIDField(
+        label = "Invitation Code", 
+        help_text= "If I've sent you a résumé but no invitaion code, contact me"
+        )
+
+    class Meta:
+        model = User
+        fields = ("username", "invitation_id", )

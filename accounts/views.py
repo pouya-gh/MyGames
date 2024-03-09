@@ -3,31 +3,40 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST 
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from .models import Profile
 from django.contrib.auth.models import User
 
-from .models import Profile
-from .forms import UserUpdateForm, ProfileForm
+from .models import Profile, Invitation
+from .forms import UserUpdateForm, ProfileForm, MyUserCreationForm
 
 def sign_up(request):
     if request.user.is_authenticated:
         return redirect("posts:game_list")
 
-    user_creation_form = UserCreationForm(request.POST or None)
+    user_creation_form = MyUserCreationForm(request.POST or None)
 
     if request.POST:
-        return HttpResponse("For security reasons, sign up is disabled for now", content_type="text/plain")
         if user_creation_form.is_valid():
             cd = user_creation_form.cleaned_data
-            new_user = user_creation_form.save()
-            new_user.profile = Profile.objects.create(user_id=new_user.id, bio="")
-            new_user.save()
-            user = authenticate(username=cd['username'], password=cd['password1'])
-            login(request, user)
-            return redirect("posts:game_list")
+
+            invitation_id = cd['invitation_id']
+            try:
+                invitation = Invitation.objects.get(id=invitation_id, is_used=False)
+                new_user = user_creation_form.save()
+                new_user.profile = Profile.objects.create(user_id=new_user.id, bio="")
+                new_user.save()
+                user = authenticate(username=cd['username'], password=cd['password1'])
+                login(request, user)
+                invitation.is_used = True
+                invitation.invitee_username = new_user.username
+                invitation.save()
+                return redirect("posts:game_list")
+            except Invitation.DoesNotExist:
+                return render(request, "registration/signup.html", {'form': user_creation_form})
+
+            
     return render(request, "registration/signup.html", {'form': user_creation_form})
 
 def profile_details(request, username):
