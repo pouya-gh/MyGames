@@ -4,37 +4,31 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404
 from .models import Profile
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
-from .models import Profile, Invitation
-from .forms import UserUpdateForm, ProfileForm, MyUserCreationForm
+from .models import Profile
+from .forms import UserUpdateForm, ProfileForm
 
 def sign_up(request):
     if request.user.is_authenticated:
         return redirect("posts:game_list")
 
-    user_creation_form = MyUserCreationForm(request.POST or None)
+    user_creation_form = UserCreationForm(request.POST or None)
 
     if request.POST:
         if user_creation_form.is_valid():
             cd = user_creation_form.cleaned_data
-
-            invitation_id = cd['invitation_id']
-            try:
-                invitation = Invitation.objects.get(id=invitation_id, is_used=False)
-                new_user = user_creation_form.save()
-                new_user.profile = Profile.objects.create(user_id=new_user.id, bio="")
-                new_user.save()
-                user = authenticate(username=cd['username'], password=cd['password1'])
-                login(request, user)
-                invitation.is_used = True
-                invitation.invitee_username = new_user.username
-                invitation.save()
-                return redirect("posts:game_list")
-            except Invitation.DoesNotExist:
-                return render(request, "registration/signup.html", {'form': user_creation_form})
+            new_user = user_creation_form.save()
+            new_user.profile = Profile.objects.create(user_id=new_user.id, bio="")
+            default_group = Group.objects.get(name="NormalUsers")
+            new_user.groups.add(default_group)
+            new_user.save()
+            user = authenticate(username=cd['username'], password=cd['password1'])
+            login(request, user)
+            return redirect("posts:game_list")
 
             
     return render(request, "registration/signup.html", {'form': user_creation_form})
