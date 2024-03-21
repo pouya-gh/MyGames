@@ -5,8 +5,8 @@ from django.views.decorators.http import require_POST
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy
 
@@ -77,12 +77,13 @@ class GameList(ListView):
         else:
             return self.model.published_games.all()
 
-class GameCreate(LoginRequiredMixin, CreateView):
+class GameCreate(PermissionRequiredMixin, CreateView):
     model = Game
     form_class = GameForm
     context_object_name = 'game'
     template_name = "posts/game/form.html"
     template_name_field = 'form'
+    permission_required = "posts.add_game"
 
     def form_valid(self, form):
         # form.cleaned_data
@@ -93,20 +94,23 @@ class GameCreate(LoginRequiredMixin, CreateView):
 
         return redirect(self.object)
     
-class GameEdit(LoginRequiredMixin, UpdateView):
+class GameEdit(PermissionRequiredMixin, UpdateView):
     model = Game
     form_class = GameForm
     context_object_name = 'game'
     template_name = "posts/game/form.html"
     template_name_field = 'form'
+    permission_required = ("posts.add_game", "posts.change_game")
 
-class GameDelete(LoginRequiredMixin, DeleteView):
+class GameDelete(PermissionRequiredMixin, DeleteView):
     model = Game
+    permission_required = "posts.delete_game"
     success_url = reverse_lazy("posts:game_list")
     def get_queryset(self):
         return self.model.objects.filter(slug=self.kwargs.get('slug', ''), author=self.request.user)
 
 @login_required
+@permission_required(["posts.change_game"])
 def edit_gamedevroles(request, slug):
     game: Game = get_object_or_404(Game, slug=slug, author=request.user)
     # devroles: GameDevRole = GameDevRole.objects.filter(game = game).all()
