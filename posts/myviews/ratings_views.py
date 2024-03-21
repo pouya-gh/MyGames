@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -7,6 +7,7 @@ from ..forms import RatingForm
 from ..models import Game, Rating
 
 @login_required
+@permission_required(["posts.add_rating", "posts.change_rating"])
 def rate_game(request, game_id):
     """
     i tried to mix 2 views in one function here, like most "create" views. 
