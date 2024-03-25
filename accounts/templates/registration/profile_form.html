@@ -81,6 +81,7 @@
             <div class="card-body">
                 <form method='post'>
                     {{ form.non_field_errors }}
+                    {{ form.errors }}
                     <div class="row gx-3 mb-3">
                         <div class="col-md-6">
                             <label class="small mb-1" for="{{ user_form.first_name.id_for_label }}">First name:</label>

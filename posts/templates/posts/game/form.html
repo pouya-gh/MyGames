@@ -75,6 +75,7 @@
             <div class="card-body">
                 <form method='post' enctype="multipart/form-data">
                     {{ form.non_field_errors }}
+                    {{ form.errors }}
                     
                     <div class="mb-3">
                         <label class="small mb-1" for="{{ form.name.id_for_label }}">Name:</label>

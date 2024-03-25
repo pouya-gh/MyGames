@@ -78,6 +78,7 @@
             <div class="card-body">
                 <form action="{% url 'login' %}" method="post">
                     {{ form.non_field_errors }}
+                    {{ form.errors }}
                     
                     <div class="mb-3">
                         <label class="small mb-1" for="{{ form.username.id_for_label }}">Username:</label>

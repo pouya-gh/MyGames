@@ -5,21 +5,22 @@
 {% block content %}
 <hr class="mt-0 mb-4">
 <div class="row">
-    <div class="mx-auto col-xl-4">
+    <div class="mx-auto col-xl-5">
         <div class="card mb-4">
             <div class="card-header">Login here</div>
             <div class="card-body">
                 <form method='post' enctype='multipart/form-data'>
                     {{ form.non_field_errors }}
+                    {{ form.errors }}
                     
                     <div class="mb-3">
                         <label class="small mb-1" for="{{ form.username.id_for_label }}">Username:</label>
                         {{ form.username }}
                     </div>
-                    <div class="mb-3">
+                    {% comment %} <div class="mb-3">
                         <label class="small mb-1" for="{{ form.invitation_id.id_for_label }}">Invitation Code:</label>
                         {{ form.invitation_id }}
-                    </div>
+                    </div> {% endcomment %}
                     <div class="mb-3">
                         <label class="small mb-1" for="{{ form.password.id_for_label }}">Password:</label>
                         {{ form.password1 }}
