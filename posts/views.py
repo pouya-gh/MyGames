@@ -141,7 +141,7 @@ def game_play(request, slug):
     game_data_root = os.path.join( settings.MEDIA_ROOT, game_file_path_maker(game, "file"), "Build")
     game_datafile_name = os.listdir(game_data_root)[0].split(".")[0]
 
-    build_path = "/" + settings.MEDIA_URL + "/" + game_data_folder
+    build_path = settings.MEDIA_URL + "/" + game_data_folder
 
     return render(request, "posts/game/play.html", {
         "game": game,
