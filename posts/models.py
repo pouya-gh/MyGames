@@ -127,3 +127,14 @@ class GameDevRole(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     role = models.CharField(max_length=250)
+
+class SiteVisitTracker(models.Model):
+    ip = models.CharField(max_length=30)
+    visit_time = models.DateTimeField(auto_now_add=True)
+    visit_counter = models.IntegerField(default=1)
+
+    class Meta:
+        ordering = ['-visit_time']
+        indexes = [
+            models.Index(fields=['-visit_time'])
+        ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Genre, Game, Comment, GameDevRole, Rating
+from .models import Genre, Game, Comment, GameDevRole, Rating, SiteVisitTracker
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
@@ -36,3 +36,8 @@ class GameDevRolesAdmin(admin.ModelAdmin):
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
     list_display = ['game', 'user', 'rating']
+
+@admin.register(SiteVisitTracker)
+class SiteVisitTrackersAdmin(admin.ModelAdmin):
+    list_display = ['ip', 'visit_time', 'visit_counter']
+    list_filter = ['ip', 'visit_time']

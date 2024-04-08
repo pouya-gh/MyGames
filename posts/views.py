@@ -1,11 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy
@@ -15,11 +16,12 @@ from taggit.models import Tag
 from .forms import GameForm, RatingForm, GameDevRoleForm, CommentForm
 from .myviews.comments_views import *
 from .myviews.ratings_views import *
-from .models import Game, Genre, Rating, GameDevRole, game_file_path_maker
+from .models import Game, Genre, Rating, GameDevRole, SiteVisitTracker, game_file_path_maker
 
 from django.conf import settings
 
 import os
+import datetime
 
 class GameDetails(DetailView):
     model = Game
@@ -76,6 +78,24 @@ class GameList(ListView):
             return self.model.published_games.filter(genre=genre)
         else:
             return self.model.published_games.all()
+        
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        add a log to my minimal visitor tracker. 
+        """
+        visitor_ip = request.META["REMOTE_ADDR"]
+        visitor = SiteVisitTracker.objects.filter(ip=visitor_ip).first()
+        if visitor:
+            visitor.visit_counter += 1
+            visitor.visit_time = datetime.datetime.now(datetime.timezone.utc)
+            visitor.save()
+            return super().get(request, *args, **kwargs)
+        elif SiteVisitTracker.objects.count() >= 100:
+            SiteVisitTracker.objects.last().delete()
+        
+        SiteVisitTracker.objects.create(ip=visitor_ip)
+        # print(request.META["REMOTE_ADDR"])
+        return super().get(request, *args, **kwargs)
 
 class GameCreate(PermissionRequiredMixin, CreateView):
     model = Game
