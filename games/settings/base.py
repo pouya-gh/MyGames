@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'posts.apps.PostsConfig',
     'taggit',
     'bootstrap5',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
