@@ -21,7 +21,7 @@ class GameDevRoleSerializer(serializers.ModelSerializer):
 class TeamMembersField(serializers.RelatedField):
     def to_representation(self, value):
         game = value.instance
-        devroles = GameDevRole.objects.filter(game=game).all()
+        devroles = GameDevRole.objects.filter(game=game).select_related("user").all()
         result = GameDevRoleSerializer(devroles, many=True)
         return result.data
 
