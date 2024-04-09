@@ -30,8 +30,7 @@ class GameDetails(DetailView):
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        slug = self.kwargs.get('slug')
-        game = get_object_or_404(self.model, slug=slug)
+        game = self.object
         comments = game.comment_set.all()
         comment_form = CommentForm()
         developers = GameDevRole.objects.filter(game=game)
