@@ -27,6 +27,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('', include('posts.urls', namespace='posts')),
     path("api/", include("posts.api.urls", namespace="api")),
+    path("api/dj-rest-auth/", include("dj_rest_auth.urls")), 
 ]
 
 if settings.DEBUG:
