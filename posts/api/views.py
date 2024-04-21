@@ -40,45 +40,49 @@ class GameRateView(APIView):
         return Response({'rated': True})
     
 
-class GameCommentListView(APIView):
+class GameCommentListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = CommentSerializer
+    queryset = Game.published_games.all()
 
-    def get_serializer(self, *args, **kwargs):
-        return CommentSerializer(*args, **kwargs)
+    # def get_serializer(self, *args, **kwargs):
+    #     return CommentSerializer(*args, **kwargs)
 
     def post(self, request, slug, format=None):
-        game = get_object_or_404(Game, slug=slug)
+        game = get_object_or_404(self.get_queryset(), slug=slug)
         body = request.data.get("body")
         game.comment_set.create(body=body, author=request.user)
         return Response({'comment_posted': True})
     
     def get(self, request, slug, format=None):
-        game = get_object_or_404(Game, slug=slug)
+        game = get_object_or_404(self.get_queryset(), slug=slug)
         query = game.comment_set.select_related("author").all()
         serializer = CommentSerializer(query, many=True, context={"request": request})
         return Response(serializer.data)
     
-class GameCommentDetailView(APIView):
+class GameCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthorOrReadOnly]
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
 
     def get_serializer(self, *args, **kwargs):
         return CommentSerializer(*args, **kwargs, context={"request": self.request})
 
     
     def get(self, request, slug, pk, format=None):
-        comment = get_object_or_404(Comment.objects.select_related("author", "game").all(), pk=pk)
+        comment = get_object_or_404(self.get_queryset().select_related("author", "game").all(), pk=pk)
         serializer = CommentSerializer(comment, context={"request": request})
         self.check_object_permissions(request, comment)
         return Response(serializer.data)
 
     def delete(self, request, slug, pk, format=None):
-        comment = get_object_or_404(Comment.objects.select_related("author").all(), pk=pk)
+        comment = get_object_or_404(self.get_queryset().select_related("author").all(), pk=pk)
         self.check_object_permissions(request, comment)
         comment.delete()
         return Response({'comment_deleted': True})
     
-    def patch(self, request, slug, pk, format=None):
-        comment = get_object_or_404(Comment.objects.select_related("author").all(), pk=pk)
+    def put(self, request, slug, pk, format=None):
+        comment = get_object_or_404(self.get_queryset().select_related("author").all(), pk=pk)
         body = request.data.get("body")
         self.check_object_permissions(request, comment)
         comment.body = body
