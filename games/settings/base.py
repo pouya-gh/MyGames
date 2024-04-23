@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "rest_framework.authtoken",
     "dj_rest_auth",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -88,6 +89,13 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Games",
+    "DESCRIPTION": "A work sample by Pouya Gharibpour",
+    "VERSION": "0.1.0",
 }
 
 WSGI_APPLICATION = 'games.wsgi.application'

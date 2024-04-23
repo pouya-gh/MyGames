@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
 from django.shortcuts import get_object_or_404
 
@@ -101,4 +101,6 @@ def api_root(request, format=None):
         "login": reverse("rest_login", request=request, format=format),
         "logout": reverse("rest_logout", request=request, format=format),
         "games": reverse("api:game_list", request=request, format=format),
+        "schema": reverse("api:schema", request=request, format=format),
+        "swagger_docs": reverse("api:swagger_docs", request=request, format=format),
     })
