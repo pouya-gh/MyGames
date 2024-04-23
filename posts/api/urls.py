@@ -2,7 +2,7 @@ from django.urls import path
 from posts.api.views import (
     GameRateView, GameListView, 
     GameRetrieveView, GameCommentListView,
-    GameCommentDetailView)
+    GameCommentDetailView, api_root)
 from rest_framework.routers import SimpleRouter
 
 # router = SimpleRouter()
@@ -11,6 +11,7 @@ from rest_framework.routers import SimpleRouter
 app_name = "api"
 
 urlpatterns = [
+    path("", api_root, name="api_root"),
     path("games/",
          GameListView.as_view(),
         name="game_list"),

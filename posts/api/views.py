@@ -95,3 +95,10 @@ class GameCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
         comment.save()
         return Response({'comment_updated': True})
         
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        "login": reverse("rest_login", request=request, format=format),
+        "logout": reverse("rest_logout", request=request, format=format),
+        "games": reverse("api:game_list", request=request, format=format),
+    })
