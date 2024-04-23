@@ -9,12 +9,8 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = ["name", "slug"]
 
-class UsernameField(serializers.RelatedField):
-    def to_representation(self, value):
-        return value.username
-
 class GameDevRoleSerializer(serializers.ModelSerializer):
-    user = UsernameField(read_only=True)
+    user = serializers.ReadOnlyField(source="user.username")
 
     class Meta:
         model = GameDevRole
@@ -59,7 +55,7 @@ class HyperlinkedGameCommentField(serializers.HyperlinkedIdentityField):
 
 class GameSerializer(serializers.ModelSerializer):
     genre = GenreSerializer()
-    author = UsernameField(read_only=True)
+    author = serializers.ReadOnlyField(source="author.username")
     team_members = TeamMembersField(read_only=True)
     file = serializers.FileField(max_length=None, allow_empty_file=False, use_url=True)
     average_rating = serializers.FloatField(read_only=True)
@@ -72,7 +68,7 @@ class GameSerializer(serializers.ModelSerializer):
                   'file', 'image', "comment_set"]
         
 class GameInlineSerializer(serializers.HyperlinkedModelSerializer):
-    author = UsernameField(read_only=True)
+    author = serializers.ReadOnlyField(source="author.username")
     genre = GenreSerializer(read_only=True)
     average_rating = serializers.FloatField(read_only=True)
 
@@ -88,7 +84,7 @@ class GameInlineSerializer(serializers.HyperlinkedModelSerializer):
         # }
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = UsernameField(read_only=True)
+    author = serializers.ReadOnlyField(source="author.username")
     game = serializers.HyperlinkedRelatedField(
         read_only=True, 
         view_name="api:game_detail", 
@@ -97,4 +93,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["id", "body", "author", "game", "url"]
+        fields = ["url", "id", "body", "author", "game",]
