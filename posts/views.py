@@ -167,3 +167,6 @@ def game_play(request, slug):
         "build_path": build_path,
         'data_name': game_datafile_name,
     })
+
+def readme_page(request):
+    return render(request, "readme.html")

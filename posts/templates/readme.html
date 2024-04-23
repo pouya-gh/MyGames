@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}ReadMe{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 id="readme">ReadMe</h1>
+    <p>This is a blog made with <em>Django</em> web framework to showcase <em>WebGL</em> games made with <em>Unity3D</em> game engine.  </p>
+    <p>The game files are uploaded in <em>zip</em> format and are extracted with <em>celery</em> using <em>redis</em> as a message broker. </p>
+    <p>You can signup to rate and comment games but normal users can&#39;t upload games. If you want to be able to do that, contact me. </p>
+    <p>There is also a REST api for normal users to see the list of games and rate and comment them. </p>
+    <h2 id="libraries-used">Libraries used</h2>
+    <ul>
+    <li>Django</li>
+    <li>Django REST framework</li>
+    <li>Celery</li>
+    <li>redis</li>
+    <li>and more!</li>
+    </ul>
+    <p><strong>Check the site&#39;s footer for source code and my FastAPI work sample!</strong></p>
+    
+</div>
+{% endblock content %}

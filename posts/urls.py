@@ -4,6 +4,7 @@ from . import views
 app_name = 'posts'
 urlpatterns = [
     path("", views.GameList.as_view(), name="home"),
+    path("readme/", views.readme_page, name='readme'),
     path("games/", views.GameList.as_view(), name="game_list"),
     path("games/play/<slug:slug>", views.game_play, name='game_play'),
     path("games/edit/<slug:slug>", views.GameEdit.as_view(), name="game_edit"),
