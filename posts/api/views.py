@@ -96,6 +96,7 @@ class GameCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response({'comment_updated': True})
         
 @api_view(['GET'])
+@permission_classes([])
 def api_root(request, format=None):
     return Response({
         "login": reverse("rest_login", request=request, format=format),
