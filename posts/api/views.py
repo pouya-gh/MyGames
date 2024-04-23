@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics, viewsets
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
 from django.shortcuts import get_object_or_404
-from rest_framework.metadata import SimpleMetadata
 
 from posts.models import Game, Rating, Comment
-from .serializers import GameSerializer, GameInlineSerializer, CommentSerializer
+from .serializers import GameSerializer, GameInlineSerializer, CommentSerializer, RatingSerializer
 from .permissions import IsAuthorOrReadOnly
 
 class GameListView(generics.ListAPIView):
@@ -26,18 +27,27 @@ class GameRetrieveView(generics.RetrieveAPIView):
 
 class GameRateView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get_serializer(self, *args, **kwargs):
+        return RatingSerializer(*args, **kwargs, context={"request": self.request})
+
     def post(self, request, slug, format=None):
-        rating = request.data.get("rating")
-        game = get_object_or_404(Game, slug=slug)
-        game_rating: Rating = Rating.objects.filter(game=game, user=request.user).first()
-        if game_rating:
-            game_rating.rating = rating
-            game_rating.save()
+        serializer = RatingSerializer(data=request.data)
+        if serializer.is_valid():
+            rating = serializer.validated_data["rating"]#.get("rating")
+            game = get_object_or_404(Game, slug=slug)
+            self.check_object_permissions(request, game)
+            game_rating: Rating = Rating.objects.filter(game=game, user=request.user).first()
+            if game_rating:
+                game_rating.rating = rating
+                game_rating.save()
+            else:
+                game.ratings.add(rating=rating, game=game, user=request.user)
+            game.average_rating = game.calculate_averate_rating()
+            game.save()
+            return Response({'rated': True})
         else:
-            game.ratings.add(rating=rating, game=game, user=request.user)
-        game.average_rating = game.calculate_averate_rating()
-        game.save()
-        return Response({'rated': True})
+            return Response({'rated': False})
     
 
 class GameCommentListView(generics.ListCreateAPIView):
@@ -64,10 +74,6 @@ class GameCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthorOrReadOnly]
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
-
-    def get_serializer(self, *args, **kwargs):
-        return CommentSerializer(*args, **kwargs, context={"request": self.request})
-
     
     def get(self, request, slug, pk, format=None):
         comment = get_object_or_404(self.get_queryset().select_related("author", "game").all(), pk=pk)

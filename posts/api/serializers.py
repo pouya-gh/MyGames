@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from posts.models import Game, Genre, GameDevRole, Comment
+from posts.models import Game, Genre, GameDevRole, Comment, Rating
 from django.contrib.auth.models import User
 
 
@@ -8,6 +8,11 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ["name", "slug"]
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ["rating"]
 
 class GameDevRoleSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source="user.username")
@@ -60,12 +65,14 @@ class GameSerializer(serializers.ModelSerializer):
     file = serializers.FileField(max_length=None, allow_empty_file=False, use_url=True)
     average_rating = serializers.FloatField(read_only=True)
     comment_set = HyperlinkedGameCommentsListField(read_only=True)
+    rate_url = serializers.HyperlinkedIdentityField(view_name="api:game_rate", lookup_field="slug")
 
     class Meta:
         model = Game
         fields = ["name", "slug", "average_rating", 
                   "genre", "author", "team_members", 
-                  'file', 'image', "comment_set"]
+                  'file', 'image', "comment_set",
+                  "rate_url"]
         
 class GameInlineSerializer(serializers.HyperlinkedModelSerializer):
     author = serializers.ReadOnlyField(source="author.username")
