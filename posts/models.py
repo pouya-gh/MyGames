@@ -22,9 +22,6 @@ class Genre(models.Model):
     def __str__(self) -> str:
         return self.name
 
-def game_file_path_maker(instance, foldername='file'):
-    return 'game_{0}/{1}'.format(instance.slug, foldername) 
-
 def game_file_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'game_{0}/{1}/{2}'.format(instance.slug, 'file', filename)
@@ -81,22 +78,25 @@ class Game(models.Model):
             previous = Game.objects.get(pk=self.id)
             if previous.file != self.file:
                 # print(f'file of {self.name} changed from {previous.file} to {self.file}')
-                shutil.rmtree(settings.MEDIA_ROOT / game_file_path_maker(previous))
+                shutil.rmtree(settings.MEDIA_ROOT / previous.file_path_maker())
                 # with zipfile.ZipFile(self.file, 'r') as thefile:
                 #     thefile.extractall(settings.MEDIA_ROOT / game_file_path_maker(self))
                 should_extract_gamefiles = True
                 
             if previous.image != self.image:
-                shutil.rmtree(settings.MEDIA_ROOT / game_file_path_maker(previous, 'image'))
+                shutil.rmtree(settings.MEDIA_ROOT / previous.file_path_maker('image'))
         else:
             pass
         super(Game, self).save(*args, **kwargs)
         if should_extract_gamefiles:
-            extract_gamefile.delay(str(settings.MEDIA_ROOT / game_file_path_maker(self)),
+            extract_gamefile.delay(str(settings.MEDIA_ROOT / self.file_path_maker()),
                                        str(self.file.path))
             
     def get_absolute_url(self):
         return reverse("posts:game_details", kwargs={"slug": self.slug})
+    
+    def file_path_maker(self, foldername='file'):
+        return 'game_{0}/{1}'.format(self.slug, foldername) 
     
 
 

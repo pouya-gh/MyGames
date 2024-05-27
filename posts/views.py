@@ -16,7 +16,7 @@ from taggit.models import Tag
 from .forms import GameForm, RatingForm, GameDevRoleForm, CommentForm
 from .myviews.comments_views import *
 from .myviews.ratings_views import *
-from .models import Game, Genre, Rating, GameDevRole, SiteVisitTracker, game_file_path_maker
+from .models import Game, Genre, Rating, GameDevRole, SiteVisitTracker
 
 from django.conf import settings
 
@@ -156,8 +156,8 @@ def edit_gamedevroles(request, slug):
 def game_play(request, slug):
     game = get_object_or_404(Game, slug=slug)
 
-    game_data_folder = game_file_path_maker(game, "file") + "/" + "Build"
-    game_data_root = os.path.join( settings.MEDIA_ROOT, game_file_path_maker(game, "file"), "Build")
+    game_data_folder = game.file_path_maker("file") + "/" + "Build"
+    game_data_root = os.path.join(settings.MEDIA_ROOT, game.file_path_maker("file"), "Build")
     game_datafile_name = os.listdir(game_data_root)[0].split(".")[0]
 
     build_path = settings.MEDIA_URL + "/" + game_data_folder

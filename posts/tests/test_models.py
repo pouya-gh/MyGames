@@ -1,5 +1,5 @@
 from django.test import TestCase
-from posts.models import Genre, Game, Rating, GameDevRole, game_file_directory_path, game_file_path_maker, game_image_directory_path
+from posts.models import Genre, Game, Rating, GameDevRole, game_file_directory_path, game_image_directory_path
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -109,11 +109,11 @@ class GameModelTestClass(TestCase):
         self.assertAlmostEqual(game.calculate_averate_rating(), 6.5)
 
     def test_game_file_path_helper_functions(self):
-        game = Game.published_games.first()
+        game: Game = Game.published_games.first()
 
-        self.assertEqual(game_file_path_maker(game), f"game_{game.slug}/file")
-        self.assertEqual(game_file_path_maker(game, "thefolder"), f"game_{game.slug}/thefolder")
+        self.assertEqual(game.file_path_maker(), f"game_{game.slug}/file")
+        self.assertEqual(game.file_path_maker("thefolder"), f"game_{game.slug}/thefolder")
 
-        self.assertEqual(game_file_directory_path(game, "filename"), f'game_{game.slug}/file/filename')
+        self.assertEqual(game_file_directory_path("filename"), f'game_{game.slug}/file/filename')
         
         self.assertEqual(game_image_directory_path(game, "imagename"), f'game_{game.slug}/image/imagename')
