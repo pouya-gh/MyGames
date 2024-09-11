@@ -132,6 +132,7 @@ class SiteVisitTracker(models.Model):
     ip = models.CharField(max_length=30)
     visit_time = models.DateTimeField(auto_now_add=True)
     visit_counter = models.IntegerField(default=1)
+    location = models.CharField(max_length=50, default="")
 
     class Meta:
         ordering = ['-visit_time']

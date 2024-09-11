@@ -39,5 +39,5 @@ class RatingAdmin(admin.ModelAdmin):
 
 @admin.register(SiteVisitTracker)
 class SiteVisitTrackersAdmin(admin.ModelAdmin):
-    list_display = ['ip', 'visit_time', 'visit_counter']
-    list_filter = ['ip', 'visit_time']
+    list_display = ['ip', 'visit_time', 'visit_counter', 'location']
+    list_filter = ['ip', 'visit_time', 'location']

@@ -17,6 +17,7 @@ from .forms import GameForm, RatingForm, GameDevRoleForm, CommentForm
 from .myviews.comments_views import *
 from .myviews.ratings_views import *
 from .models import Game, Genre, Rating, GameDevRole, SiteVisitTracker
+from .tasks import find_ip_location
 
 from django.conf import settings
 
@@ -88,11 +89,14 @@ class GameList(ListView):
             visitor.visit_counter += 1
             visitor.visit_time = datetime.datetime.now(datetime.timezone.utc)
             visitor.save()
+            if not visitor.location:
+                find_ip_location.delay(visitor_ip)
             return super().get(request, *args, **kwargs)
         elif SiteVisitTracker.objects.count() >= 100:
             SiteVisitTracker.objects.last().delete()
         
         SiteVisitTracker.objects.create(ip=visitor_ip)
+        find_ip_location.delay(visitor_ip)
         # print(request.META["REMOTE_ADDR"])
         return super().get(request, *args, **kwargs)
 
