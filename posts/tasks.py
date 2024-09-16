@@ -1,7 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 from celery import shared_task
 import zipfile
-import geocoder
+
+import urllib.request
+import json
 
 import posts
 
@@ -18,13 +20,14 @@ def extract_gamefile(new_game_path, new_game_file):
 
 @shared_task
 def find_ip_location(ip):
-    result = geocoder.ip(ip)
-    location = f"{result.country}:{result.city}"
-    print(location)
-    try:
-        record: posts.models.SiteVisitTracker = posts.models.SiteVisitTracker.objects.filter(ip=ip).first()
-        record.location = location
-        record.save()
-    except ObjectDoesNotExist:
-        pass
-    return True
+    with urllib.request.urlopen(f"http://ip-api.com/json/{ip}") as url:
+        data = url.read().decode()
+        j = json.loads(data)
+        location = f"{j['country']}:{j['regionName']}:{j['city']}"
+        try:
+            record: posts.models.SiteVisitTracker = posts.models.SiteVisitTracker.objects.filter(ip=ip).first()
+            record.location = location
+            record.save()
+        except ObjectDoesNotExist:
+            pass
+        return True
