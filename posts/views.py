@@ -91,12 +91,12 @@ class GameList(ListView):
             visitor.save()
             if not visitor.location:
                 find_ip_location.delay(visitor_ip)
-            return super().get(request, *args, **kwargs)
-        elif SiteVisitTracker.objects.count() >= 100:
-            SiteVisitTracker.objects.last().delete()
+        else:
+            if SiteVisitTracker.objects.count() >= 100:
+                SiteVisitTracker.objects.last().delete()
+            SiteVisitTracker.objects.create(ip=visitor_ip)
+            find_ip_location.delay(visitor_ip)
         
-        SiteVisitTracker.objects.create(ip=visitor_ip)
-        find_ip_location.delay(visitor_ip)
         # print(request.META["REMOTE_ADDR"])
         return super().get(request, *args, **kwargs)
 
