@@ -89,8 +89,6 @@ class GameList(ListView):
             visitor.visit_counter += 1
             visitor.visit_time = datetime.datetime.now(datetime.timezone.utc)
             visitor.save()
-            if not visitor.location:
-                find_ip_location.delay(visitor_ip)
         else:
             if SiteVisitTracker.objects.count() >= 100:
                 SiteVisitTracker.objects.last().delete()
