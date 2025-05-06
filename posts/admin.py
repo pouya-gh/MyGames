@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Genre, Game, Comment, GameDevRole, Rating, SiteVisitTracker
+from .models import Genre, Game, Comment, GameDevRole, Rating, SiteVisitTracker, SiteVisitTrackerVisitedPath
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
@@ -20,7 +20,7 @@ class GameAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['game', 'author', 'body']
-    list_filter = ['game', 'created']
+    list_filter = [("game", admin.RelatedOnlyFieldListFilter), 'created']
     search_fields = ['game', 'author', 'body']
 
     raw_id_fields = ['game', 'author']
@@ -41,3 +41,9 @@ class RatingAdmin(admin.ModelAdmin):
 class SiteVisitTrackersAdmin(admin.ModelAdmin):
     list_display = ['ip', 'visit_time', 'visit_counter', 'location']
     list_filter = ['ip', 'visit_time', 'location']
+
+@admin.register(SiteVisitTrackerVisitedPath)
+class SiteVIsitTrackerPathAdmin(admin.ModelAdmin):
+    list_display = ["ip", "updated_at", "path"]
+    list_filter = [("ip", admin.RelatedOnlyFieldListFilter), "path"]
+    search_fields = ['ip', 'path']

@@ -139,3 +139,18 @@ class SiteVisitTracker(models.Model):
         indexes = [
             models.Index(fields=['-visit_time'])
         ]
+
+    def __str__(self):
+        return self.ip
+
+class SiteVisitTrackerVisitedPath(models.Model):
+    path = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    ip = models.ForeignKey(SiteVisitTracker, on_delete=models.CASCADE, related_name="visited_paths")
+
+    class Meta:
+        ordering = ['-updated_at', "ip"]
+        indexes = [
+            models.Index(fields=["ip"])
+        ]
