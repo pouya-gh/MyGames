@@ -18,8 +18,18 @@ class TestPostsGamesViews(TestCase):
             image_bytes = image.read()
         with open('media/test.zip', 'rb') as file:
             file_bytes = file.read()
-        User.objects.create(**{'username':"user1", 'password':"123456789))"})
-        User.objects.create(**{'username':"user2", 'password':"123456789)"})
+
+        new_user = User.objects.create_user(**{'username':"user1", 'password':"123456789))"})
+        # this because of the permissions. a user without superuser status or without 
+        # being assigned to a proper group won't be able to access certain views
+        # poor design choice. i know.
+        new_user.is_superuser = True 
+        new_user.save()
+
+        new_user2 = User.objects.create_user(**{'username':"user2", 'password':"123456789))"})
+        new_user2.is_superuser = True
+        new_user2.save()
+
         Genre.objects.create(name="FPS", slug="fps")
         Genre.objects.create(name='RPG', slug='rpg')
         game1 = Game.objects.create(name = 'very cool game', slug='very-cool-game', 
@@ -148,7 +158,8 @@ class TestPostsGamesViews(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_games_creat_view_post_with_empty_fields(self):
-        login = self.client.force_login(User.objects.first())
+        # login = self.client.force_login(User.objects.first())
+        self.client.login(**{'username':"user1", 'password':"123456789))"})
         image_bytes = None
         file_bytes = None
         with open("media/1x1.png", "rb") as image:

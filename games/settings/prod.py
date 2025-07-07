@@ -7,7 +7,10 @@ ADMINS = [
     ('Pouya Gharibpour', 'p.gharibpour@gmail.com'),
 ]
 
-# ALLOWED_HOSTS = ['*']
+if envrion_vars("ALLOWED_HOSTS"):
+    ALLOWED_HOSTS = envrion_vars("ALLOWED_HOSTS").split("|")
+else:
+    ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {

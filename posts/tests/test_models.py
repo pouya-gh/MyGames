@@ -114,6 +114,6 @@ class GameModelTestClass(TestCase):
         self.assertEqual(game.file_path_maker(), f"game_{game.slug}/file")
         self.assertEqual(game.file_path_maker("thefolder"), f"game_{game.slug}/thefolder")
 
-        self.assertEqual(game_file_directory_path("filename"), f'game_{game.slug}/file/filename')
+        self.assertEqual(game_file_directory_path(game, "filename"), f'game_{game.slug}/file/filename')
         
         self.assertEqual(game_image_directory_path(game, "imagename"), f'game_{game.slug}/image/imagename')
