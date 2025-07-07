@@ -23,6 +23,7 @@ jobs:
         env:
             REDIS_URL: redis://localhost:6379/0
             SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+            DJANGO_SETTINGS_MODULE: games.settings.test
 
         steps:
         - uses: actions/checkout@v4
@@ -42,11 +43,10 @@ jobs:
 
         - name: Start Celery worker
           run: |
-            celery -A your_project worker --loglevel=info &
+            celery -A games worker -l info --pool=solo
           env:
             REDIS_URL: redis://localhost:6379/0
 
         - name: Run tests
           run: python manage.py test
-          env:
-            DJANGO_SETTINGS_MODULE: games.settings.test
+            
