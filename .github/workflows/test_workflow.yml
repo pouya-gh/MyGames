@@ -22,7 +22,7 @@ jobs:
 
         env:
             REDIS_URL: redis://localhost:6379/0
-            SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+            MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
             DJANGO_SETTINGS_MODULE: games.settings.test
 
         steps:
