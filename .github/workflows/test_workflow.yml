@@ -1,0 +1,52 @@
+name: Django CI
+run-name: Running Tests
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        services:
+            redis:
+                image: redis:7
+                ports:
+                    - 6379:6379
+                options: >-
+                    --health-cmd "redis-cli ping"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            DJANGO_SETTINGS_MODULE: your_project.settings
+            REDIS_URL: redis://localhost:6379/0
+
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.13'
+
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+        - name: Run migrations
+          run: python manage.py migrate
+
+        - name: Start Celery worker
+          run: |
+            celery -A your_project worker --loglevel=info &
+          env:
+            REDIS_URL: redis://localhost:6379/0
+
+        - name: Run tests
+          run: python manage.py test
+          env:
+            DJANGO_SETTINGS_MODULE: games.settings.test
