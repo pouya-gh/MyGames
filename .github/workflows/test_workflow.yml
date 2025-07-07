@@ -43,7 +43,7 @@ jobs:
 
         - name: Start Celery worker
           run: |
-            celery -A games worker -l info --pool=solo
+            celery -A games worker -l info --pool=solo &
           env:
             REDIS_URL: redis://localhost:6379/0
 
