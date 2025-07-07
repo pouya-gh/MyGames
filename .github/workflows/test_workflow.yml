@@ -21,8 +21,8 @@ jobs:
                     --health-retries 5
 
         env:
-            DJANGO_SETTINGS_MODULE: your_project.settings
             REDIS_URL: redis://localhost:6379/0
+            SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
 
         steps:
         - uses: actions/checkout@v4
