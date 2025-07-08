@@ -55,7 +55,6 @@ jobs:
       DJANGO_SETTINGS_MODULE: games.settings.prod
     steps:
       - name: Deploy to VPS
-        if: env.SHOULD_DEPLOY == '1'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
