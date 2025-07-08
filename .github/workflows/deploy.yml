@@ -51,8 +51,6 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    env:
-      DJANGO_SETTINGS_MODULE: games.settings.prod
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -62,9 +60,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            export DJANGO_SETTINGS_MODULE="games.settings.prod"
             cd games/
             git pull origin main
             source ../.gameenv/bin/activate
+            pip install --upgrade pip
             pip install -r requirements.txt
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput
