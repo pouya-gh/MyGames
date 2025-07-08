@@ -50,7 +50,6 @@ jobs:
 
   deploy:
     needs: test
-    if: env.SHOULD_DEPLOY == '1'
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: games.settings.prod
