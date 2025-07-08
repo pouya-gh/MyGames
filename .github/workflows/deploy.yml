@@ -51,6 +51,8 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
+    # So i can prevent deoployment without changing the code.
+    if: ${{ vars.SHOULD_DEPLOY == '1' }}
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -60,10 +62,10 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            export DJANGO_SETTINGS_MODULE="games.settings.prod"
-            cd games/
+            export DJANGO_SETTINGS_MODULE="${{ vars.DJANGO_SETTINGS_MODULE }}"
+            cd ${{ vars.PROJECT_DIR }}
             git pull origin main
-            source ../.gameenv/bin/activate
+            source ${{ vars.VENV_DIR }}
             pip install --upgrade pip
             pip install -r requirements.txt
             python manage.py migrate --noinput
